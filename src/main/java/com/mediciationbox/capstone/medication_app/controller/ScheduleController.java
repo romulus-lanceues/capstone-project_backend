@@ -81,7 +81,7 @@ public class ScheduleController {
     }
 
 
-    //Get - History of the medication for a week ---History
+    //Get - History of the medication for a week -- History
     @GetMapping("api/weekly_history/{id}")
     public List<Schedule> getHistory(@PathVariable Long id){
         return scheduleService.retrieveHistory(id);

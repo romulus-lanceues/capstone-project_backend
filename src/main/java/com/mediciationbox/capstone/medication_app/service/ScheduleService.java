@@ -24,14 +24,16 @@ public class ScheduleService {
     public Schedule
     createSchedule(AddScheduleDTO addScheduleDTO){
 
-        Schedule schedule = new Schedule(addScheduleDTO.getName(), addScheduleDTO.getTimeOfIntake(), addScheduleDTO.getFrequency(), false);
-        schedule.setUser(userRepository.findByEmail(addScheduleDTO.getUserEmail()));
+        Schedule schedule = new Schedule(addScheduleDTO.name(), addScheduleDTO.timeOfIntake(), addScheduleDTO.frequency(), addScheduleDTO.duration(), addScheduleDTO.notes(),false);
+        schedule.setUser(userRepository.findByEmail(addScheduleDTO.userEmail()));
 
         return schedule;
     }
 
     public List<Schedule> retrieveScheduleForToday(Long id){
         Optional<User> account = userRepository.findById(id);
+
+        //Add exception if user ID is invalid for some reason
 
         List<Schedule> allSchedule = account.get().getUserSchedule();
 
