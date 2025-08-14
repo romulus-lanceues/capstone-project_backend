@@ -65,7 +65,7 @@ public class UserAuthenticationController {
     public ResponseEntity<ResponseDTO>
     logInUser(@Validated @RequestBody LogInDTO accountCredentials){
 
-        return new ResponseEntity<>(userAuthenticationService.verifyLogInCredentials(accountCredentials.getEmail(), accountCredentials.getPassword()), HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(userAuthenticationService.verifyLogInCredentials(accountCredentials.email(), accountCredentials.password()), HttpStatus.ACCEPTED);
 
     }
 
