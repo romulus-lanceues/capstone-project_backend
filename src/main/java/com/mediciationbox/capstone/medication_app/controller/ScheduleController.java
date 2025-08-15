@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -83,8 +84,8 @@ public class ScheduleController {
 
     //Get - History of the medication for a week -- History
     @GetMapping("api/weekly_history/{id}")
-    public List<Schedule> getHistory(@PathVariable Long id){
-        return scheduleService.retrieveHistory(id);
+    public Map<LocalDate, List<Schedule>> getHistory(@PathVariable Long id){
+        List<Schedule> sortedHistory = scheduleService.retrieveHistory(id);
+        return scheduleService.sortByDay(sortedHistory);
     }
-
 }

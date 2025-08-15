@@ -6,12 +6,10 @@ import com.mediciationbox.capstone.medication_app.model.User;
 import com.mediciationbox.capstone.medication_app.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -97,5 +95,17 @@ public class ScheduleService {
         sortedByDate.sort(Comparator.comparing(schedule -> schedule.getTimeOfIntake().toLocalDate()));
 
         return sortScheduledTime(sortedByDate);
+    }
+
+    public Map<LocalDate, List<Schedule>> sortByDay (List<Schedule> sortedSchedule){
+
+        Map<LocalDate, List<Schedule>> history = new HashMap<>();
+
+        for(Schedule schedule : sortedSchedule){
+            LocalDate date = schedule.getTimeOfIntake().toLocalDate();
+            history.computeIfAbsent(date, currentSchedule -> new ArrayList<>()).add(schedule);
+        }
+
+        return  history;
     }
 }
