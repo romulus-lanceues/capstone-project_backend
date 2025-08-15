@@ -7,9 +7,12 @@ import com.mediciationbox.capstone.medication_app.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ScheduleService {
@@ -30,6 +33,7 @@ public class ScheduleService {
         return schedule;
     }
 
+    //
     public List<Schedule> retrieveScheduleForToday(Long id){
         Optional<User> account = userRepository.findById(id);
 
@@ -46,28 +50,52 @@ public class ScheduleService {
             }
         }
 
-        return allScheduleForToday;
+        return sortScheduledTime(allScheduleForToday);
+
     }
+
 
     public List<Schedule> retrieveHistory(Long id){
         Optional<User> account = userRepository.findById(id);
 
         List<Schedule> allSchedule = account.get().getUserSchedule();
-        List<Schedule> history = new ArrayList<>();
+
 
         LocalDateTime historyStart = LocalDateTime.now().minusDays(7);
         LocalDateTime historyEndPoint = LocalDateTime.now().minusDays(1);
 
-        for(Schedule schedule : allSchedule){
-            if(schedule.getTimeOfIntake().getDayOfYear() >= historyStart.getDayOfYear() && schedule.getTimeOfIntake().getDayOfYear() <= historyEndPoint.getDayOfYear()){
-                history.add(schedule);
-            }
-        }
 
-        return history;
+//        List<Schedule> history = allSchedule.stream().filter(schedule -> {
+//            LocalDateTime scheduleDate = schedule.getTimeOfIntake();
+//            return !scheduleDate.isBefore(historyStart) && !scheduleDate.isAfter(historyEndPoint);
+//        }).collect(Collectors.toList());
+
+        List<Schedule> history = allSchedule.stream().filter(schedule -> {
+            return !schedule.getTimeOfIntake().isBefore(historyStart) && !schedule.getTimeOfIntake().isAfter(historyEndPoint);
+        }).collect(Collectors.toList());
+
+        return sortByDateAndTime(history);
     }
 
-//    public List<Schedule> sortScheduledMedication(){
-//
-//    }
+
+    //Supporting methods
+
+    private List<Schedule> sortScheduledTime(List<Schedule> scheduleForToday){
+
+        //Listed schedule are the ones stored in this array already
+        List<Schedule> sortedScheduleList = new ArrayList<>(scheduleForToday);
+
+        sortedScheduleList.sort(Comparator.comparing(schedule -> schedule.getTimeOfIntake().toLocalTime()));
+
+        return sortedScheduleList;
+    }
+
+    //Supporting Method that sorts the history by date and time for the history controller
+    private List<Schedule> sortByDateAndTime(List<Schedule> historySchedules){
+        List<Schedule> sortedByDate = new ArrayList<>(historySchedules);
+
+        sortedByDate.sort(Comparator.comparing(schedule -> schedule.getTimeOfIntake().toLocalDate()));
+
+        return sortScheduledTime(sortedByDate);
+    }
 }
