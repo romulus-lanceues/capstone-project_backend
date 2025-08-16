@@ -59,8 +59,8 @@ public class ScheduleService {
         List<Schedule> allSchedule = account.get().getUserSchedule();
 
 
-        LocalDateTime historyStart = LocalDateTime.now().minusDays(7);
-        LocalDateTime historyEndPoint = LocalDateTime.now().minusDays(1);
+        LocalDate historyStart = LocalDateTime.now().toLocalDate().minusDays(7);
+        LocalDate historyEndPoint = LocalDateTime.now().toLocalDate().minusDays(1);
 
 
 //        List<Schedule> history = allSchedule.stream().filter(schedule -> {
@@ -69,8 +69,9 @@ public class ScheduleService {
 //        }).collect(Collectors.toList());
 
         List<Schedule> history = allSchedule.stream().filter(schedule -> {
-            return !schedule.getTimeOfIntake().isBefore(historyStart) && !schedule.getTimeOfIntake().isAfter(historyEndPoint);
+             return !schedule.getTimeOfIntake().toLocalDate().isBefore(historyStart) && !schedule.getTimeOfIntake().toLocalDate().isAfter(historyEndPoint);
         }).collect(Collectors.toList());
+
 
         return sortByDateAndTime(history);
     }
@@ -90,6 +91,7 @@ public class ScheduleService {
 
     //Supporting Method that sorts the history by date and time for the history controller
     private List<Schedule> sortByDateAndTime(List<Schedule> historySchedules){
+
         List<Schedule> sortedByDate = new ArrayList<>(historySchedules);
 
         sortedByDate.sort(Comparator.comparing(schedule -> schedule.getTimeOfIntake().toLocalDate()));
