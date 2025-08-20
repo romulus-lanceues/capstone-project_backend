@@ -36,18 +36,23 @@ public class User {
     @JsonIgnore
     private List<Schedule> userSchedule;
 
+    @OneToMany(mappedBy = "user")
+    @JsonIgnore
+    private  List<Notification> userNotifications;
+
     private String name;
 
     public User(){
 
     }
 
-    public User(Long id, String email, String password, LocalDateTime createdAt, List<Schedule> userSchedule) {
+    public User(Long id, String email, String password, LocalDateTime createdAt, List<Schedule> userSchedule, List<Notification> userNotifications) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.createdAt = createdAt;
         this.userSchedule = userSchedule;
+        this.userNotifications = userNotifications;
     }
 
 
@@ -91,15 +96,6 @@ public class User {
         this.userSchedule = userSchedule;
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "email='" + email + '\'' +
-                ", id=" + id +
-                ", password='" + password + '\'' +
-                ", createdAt=" + createdAt +
-                '}';
-    }
 
     public String getName() {
         return name;
@@ -107,5 +103,26 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public List<Notification> getUserNotifications() {
+        return userNotifications;
+    }
+
+    public void setUserNotifications(List<Notification> userNotifications) {
+        this.userNotifications = userNotifications;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "createdAt=" + createdAt +
+                ", id=" + id +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", userSchedule=" + userSchedule +
+                ", userNotifications=" + userNotifications +
+                ", name='" + name + '\'' +
+                '}';
     }
 }

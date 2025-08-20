@@ -1,8 +1,11 @@
 package com.mediciationbox.capstone.medication_app.service;
 
 import com.mediciationbox.capstone.medication_app.dto.AddScheduleDTO;
+import com.mediciationbox.capstone.medication_app.exception.NoExistingAccountException;
+import com.mediciationbox.capstone.medication_app.exception.NoExistingScheduleException;
 import com.mediciationbox.capstone.medication_app.model.Schedule;
 import com.mediciationbox.capstone.medication_app.model.User;
+import com.mediciationbox.capstone.medication_app.repository.ScheduleRepository;
 import com.mediciationbox.capstone.medication_app.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -16,9 +19,11 @@ import java.util.stream.Collectors;
 public class ScheduleService {
 
     private UserRepository userRepository;
+    private ScheduleRepository scheduleRepository;
 
-    public ScheduleService(UserRepository userRepository) {
+    public ScheduleService(UserRepository userRepository, ScheduleRepository scheduleRepository) {
         this.userRepository = userRepository;
+        this.scheduleRepository = scheduleRepository;
     }
 
 
@@ -94,14 +99,14 @@ public class ScheduleService {
 
         List<Schedule> sortedByDate = new ArrayList<>(historySchedules);
 
-        sortedByDate.sort(Comparator.comparing(schedule -> schedule.getTimeOfIntake().toLocalDate()));
+        sortedByDate.sort(Comparator.comparing(Schedule::getTimeOfIntake).reversed());
 
-        return sortScheduledTime(sortedByDate);
+
+        return sortedByDate;
     }
 
     public Map<LocalDate, List<Schedule>> sortByDay (List<Schedule> sortedSchedule){
-
-        Map<LocalDate, List<Schedule>> history = new HashMap<>();
+        Map<LocalDate, List<Schedule>> history = new LinkedHashMap<>();
 
         for(Schedule schedule : sortedSchedule){
             LocalDate date = schedule.getTimeOfIntake().toLocalDate();
@@ -109,5 +114,33 @@ public class ScheduleService {
         }
 
         return  history;
+    }
+
+    public void updateScheduleStatus(Integer scheduleId, Long userId){
+        Optional<User> user = userRepository.findById(userId);
+
+        if(user.isEmpty()){
+            throw new NoExistingAccountException("No account found");
+        }
+        List<Schedule> userSchedule = user.get().getUserSchedule();
+
+        Optional<Schedule> s = userSchedule.stream()
+                .filter(schedule -> schedule.getId().equals(scheduleId))
+                .findFirst(); //Map expects a value back
+
+        Schedule schedule = s.orElseThrow( () -> new NoExistingAccountException("message")); //.setDone(true);
+
+        schedule.setDone(true);
+        scheduleRepository.save(schedule);
+
+    }
+
+    public void deleteSchedule(Integer scheduleId){
+
+        //Check if the schedule is valid
+        Optional<Schedule> optionalSchedule = scheduleRepository.findById(scheduleId);
+        Schedule validSchedule = optionalSchedule.orElseThrow( () -> new NoExistingScheduleException("Schedule doesn't exist"));
+
+        scheduleRepository.delete(validSchedule);
     }
 }

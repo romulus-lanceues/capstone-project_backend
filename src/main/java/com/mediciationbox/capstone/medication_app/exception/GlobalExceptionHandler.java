@@ -55,7 +55,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(exception, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(NoExistingAccountException.class)
+    @ExceptionHandler({NoExistingAccountException.class, NoExistingScheduleException.class})
     public ResponseEntity<ExceptionTemplate>
         noExistingAccount(Exception ex, HttpServletRequest httpServletRequest){
 

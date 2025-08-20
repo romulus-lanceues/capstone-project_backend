@@ -2,8 +2,11 @@ package com.mediciationbox.capstone.medication_app.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
 @Entity
 public class Schedule {
 
@@ -13,9 +16,13 @@ public class Schedule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+
     private String name;
+
     private LocalDateTime timeOfIntake;
+
     private String frequency;
+
     private Integer duration;
     private String notes;
     private boolean done;
@@ -23,6 +30,10 @@ public class Schedule {
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     private User user;
+
+    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<Notification> notifications;
 
     public Schedule(){
 

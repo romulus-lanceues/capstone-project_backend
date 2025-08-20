@@ -84,8 +84,25 @@ public class ScheduleController {
 
     //Get - History of the medication for a week -- History
     @GetMapping("api/weekly_history/{id}")
-    public Map<LocalDate, List<Schedule>> getHistory(@PathVariable Long id){
+    public Map<LocalDate,List<Schedule>> getHistory(@PathVariable Long id){
         List<Schedule> sortedHistory = scheduleService.retrieveHistory(id);
         return scheduleService.sortByDay(sortedHistory);
+    }
+
+    //Update an entry to true
+    @PatchMapping("api/update-schedule-to-done/{userId}/{scheduleId}")
+    public ResponseEntity<ResponseDTO> updateAScheduleToDone(@PathVariable Long userId, @PathVariable Integer scheduleId){
+        scheduleService.updateScheduleStatus(scheduleId, userId);
+        ResponseDTO responseDTO = new ResponseDTO(true, "Success", Map.of("isDone", true));
+
+           return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+
+    }
+
+    @DeleteMapping("/api/drop-schedule/{scheduleId}")
+    public ResponseEntity<ResponseDTO> deleteSchedule(@PathVariable Integer scheduleId){
+        scheduleService.deleteSchedule(scheduleId);
+        ResponseDTO responseDTO = new ResponseDTO(true, "Success", Map.of("isDeleted", true));
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 }
