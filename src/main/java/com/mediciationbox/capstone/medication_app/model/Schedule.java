@@ -1,6 +1,7 @@
 package com.mediciationbox.capstone.medication_app.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
@@ -8,6 +9,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Schedule {
 
     //Validation
@@ -31,9 +33,18 @@ public class Schedule {
     @JsonIgnore
     private User user;
 
-    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
+
+    //Fields for creation of updated schedules
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
-    private List<Notification> notifications;
+    private Schedule parentSchedule;
+
+    @OneToMany(mappedBy = "parentSchedule", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<Schedule> childSchedules;
+
+    private boolean isGenerated = false;
+
 
     public Schedule(){
 
@@ -59,6 +70,19 @@ public class Schedule {
         this.duration = duration;
         this.notes = notes;
         this.done = done;
+    }
+
+    //Used for creation of child schedules
+    public Schedule(Schedule parentSchedule, LocalDateTime newTimeOfIntake) {
+        this.name = parentSchedule.getName();
+        this.timeOfIntake = newTimeOfIntake;
+        this.frequency = parentSchedule.getFrequency();
+        this.duration = parentSchedule.getDuration();
+        this.notes = parentSchedule.getNotes();
+        this.done = false;
+        this.parentSchedule = parentSchedule;
+        this.isGenerated = true;
+        this.user = parentSchedule.getUser();
     }
 
     public boolean isDone() {
@@ -126,17 +150,47 @@ public class Schedule {
         this.notes = notes;
     }
 
+
+    public List<Schedule> getChildSchedules() {
+        return childSchedules;
+    }
+
+    public void setChildSchedules(List<Schedule> childSchedules) {
+        this.childSchedules = childSchedules;
+    }
+
+    public boolean isGenerated() {
+        return isGenerated;
+    }
+
+    public void setGenerated(boolean generated) {
+        isGenerated = generated;
+    }
+
+
+    public Schedule getParentSchedule() {
+        return parentSchedule;
+    }
+
+    public void setParentSchedule(Schedule parentSchedule) {
+        this.parentSchedule = parentSchedule;
+    }
+
+
     @Override
     public String toString() {
         return "Schedule{" +
-                "done=" + done +
+                "childSchedules=" + childSchedules +
                 ", id=" + id +
                 ", name='" + name + '\'' +
                 ", timeOfIntake=" + timeOfIntake +
                 ", frequency='" + frequency + '\'' +
                 ", duration=" + duration +
                 ", notes='" + notes + '\'' +
+                ", done=" + done +
                 ", user=" + user +
+                ", parentSchedule=" + parentSchedule +
+                ", isGenerated=" + isGenerated +
                 '}';
     }
 }

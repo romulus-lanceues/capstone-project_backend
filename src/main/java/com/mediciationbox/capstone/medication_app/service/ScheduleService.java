@@ -1,17 +1,22 @@
 package com.mediciationbox.capstone.medication_app.service;
 
+import com.mediciationbox.capstone.medication_app.config.ScheduledTasks;
 import com.mediciationbox.capstone.medication_app.dto.AddScheduleDTO;
+import com.mediciationbox.capstone.medication_app.dto.SchedulesForTodayEvent;
 import com.mediciationbox.capstone.medication_app.exception.NoExistingAccountException;
 import com.mediciationbox.capstone.medication_app.exception.NoExistingScheduleException;
 import com.mediciationbox.capstone.medication_app.model.Schedule;
 import com.mediciationbox.capstone.medication_app.model.User;
 import com.mediciationbox.capstone.medication_app.repository.ScheduleRepository;
 import com.mediciationbox.capstone.medication_app.repository.UserRepository;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -21,9 +26,14 @@ public class ScheduleService {
     private UserRepository userRepository;
     private ScheduleRepository scheduleRepository;
 
-    public ScheduleService(UserRepository userRepository, ScheduleRepository scheduleRepository) {
+    //Development Event Publisher
+    private final ApplicationEventPublisher applicationEventPublisher;
+
+
+    public ScheduleService(UserRepository userRepository, ScheduleRepository scheduleRepository, ApplicationEventPublisher applicationEventPublisher) {
         this.userRepository = userRepository;
         this.scheduleRepository = scheduleRepository;
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 
 
@@ -38,23 +48,97 @@ public class ScheduleService {
 
     //
     public List<Schedule> retrieveScheduleForToday(Long id){
+        //Find the user
         Optional<User> account = userRepository.findById(id);
-
         //Add exception if user ID is invalid for some reason
+        User user = account.orElseThrow(() -> new NoExistingAccountException("Account doesn't exist"));
 
-        List<Schedule> allSchedule = account.get().getUserSchedule();
-
+        //Will be used in the filtering
         LocalDateTime currentDate = LocalDateTime.now();
-        List<Schedule> allScheduleForToday = new ArrayList<>();
+        LocalDate today = currentDate.toLocalDate();
+        LocalDateTime startOfDay = today.atStartOfDay();
+        LocalDateTime endOfDay = today.atTime(23, 59, 59);
 
-        for(Schedule schedule : allSchedule){
-            if(schedule.getTimeOfIntake().getDayOfMonth() == currentDate.getDayOfMonth()){
-                allScheduleForToday.add(schedule);
+        List<Schedule> allSchedule = user.getUserSchedule();
+        // Filter to only get parent schedules (not generated ones)
+        List<Schedule> parentSchedulesOnly = allSchedule.stream()
+                .filter(schedule -> !schedule.isGenerated())
+                .toList();
+
+        //Filter parent schedules that are due today
+        List<Schedule> parentsDueToday =  parentSchedulesOnly.stream().filter(schedule -> {
+            LocalDateTime startingDate = schedule.getTimeOfIntake();
+            //Switch
+            switch (schedule.getFrequency()){
+                case "daily":
+                    LocalDateTime scheduleEndForDaily = schedule.getTimeOfIntake().plusDays(schedule.getDuration());
+                    return !currentDate.toLocalDate().isBefore(startingDate.toLocalDate()) && !currentDate.toLocalDate().isAfter(scheduleEndForDaily.toLocalDate());
+
+                case "weekly":
+                    LocalDateTime scheduleEnd = startingDate.plusWeeks(schedule.getDuration());
+
+                    // Check if current date is within the schedule period
+                    if (currentDate.toLocalDate().isBefore(startingDate.toLocalDate()) || currentDate.toLocalDate().isAfter(scheduleEnd.toLocalDate())) {
+                        return false;
+                    }
+                    // Calculate how many days have passed since the start
+                    long daysBetween = ChronoUnit.DAYS.between(startingDate.toLocalDate(), currentDate.toLocalDate());
+
+                    // Check if it's exactly a weekly interval (0, 7, 14, 21 days)
+                    return daysBetween % 7 == 0;
+                default:
+                    return false;
             }
+        }).toList();
+
+
+
+        List<Schedule> scheduleForToday = new ArrayList<>();
+
+        //Get Parent Id's
+        List<Integer> parentsIds = parentsDueToday.stream().map(Schedule::getId).toList();
+
+        List<Schedule> allChildrenForToday = scheduleRepository.findByParentScheduleIdInAndTimeOfIntakeBetween(parentsIds, startOfDay, endOfDay);
+
+        Map<Integer, List<Schedule>> childByParentId = allChildrenForToday.stream().collect(Collectors.groupingBy(child -> child.getParentSchedule().getId()));
+
+        List<Schedule> createdSchedules = new ArrayList<>();
+        for(Schedule parent : parentsDueToday){
+
+            if(!parent.getTimeOfIntake().isBefore(startOfDay) && !parent.getTimeOfIntake().isAfter(endOfDay) ){
+                scheduleForToday.add(parent);
+                continue;
+            }
+
+            List<Schedule> existingChildren = childByParentId.getOrDefault(parent.getId(), Collections.emptyList());
+            if(existingChildren.isEmpty()){
+                LocalDateTime newScheduleTime = today.atTime(parent.getTimeOfIntake().toLocalTime());
+                Schedule newSchedule = new Schedule(parent, newScheduleTime);
+                createdSchedules.add(newSchedule);
+                scheduleForToday.add(newSchedule);
+            }
+            else {
+                scheduleForToday.addAll(existingChildren);
+            }
+
         }
+        scheduleRepository.saveAll(createdSchedules);
 
-        return sortScheduledTime(allScheduleForToday);
+        //Create an event for the event listeners to listen to
+        applicationEventPublisher.publishEvent( new SchedulesForTodayEvent(scheduleForToday, LocalDate.now()));
 
+        return sortScheduledTime(scheduleForToday);
+
+    }
+    //Supporting method that checks of the schedule already exists
+    public boolean checkIfTheScheduleAlreadyExists(Schedule parentSchedule, LocalDateTime currentDate) {
+        LocalDate today = currentDate.toLocalDate();
+        LocalDateTime startOfDay = today.atStartOfDay();
+        LocalDateTime endOfDay = today.atTime(23, 59, 59);
+
+        return scheduleRepository.existsByParentScheduleAndTimeOfIntakeBetween(
+                parentSchedule, startOfDay, endOfDay
+        );
     }
 
 
@@ -89,7 +173,7 @@ public class ScheduleService {
         //Listed schedule are the ones stored in this array already
         List<Schedule> sortedScheduleList = new ArrayList<>(scheduleForToday);
 
-        sortedScheduleList.sort(Comparator.comparing(schedule -> schedule.getTimeOfIntake().toLocalTime()));
+        sortedScheduleList.sort(Comparator.comparing(Schedule::getTimeOfIntake));
 
         return sortedScheduleList;
     }

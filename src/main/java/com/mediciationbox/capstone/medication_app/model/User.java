@@ -36,9 +36,6 @@ public class User {
     @JsonIgnore
     private List<Schedule> userSchedule;
 
-    @OneToMany(mappedBy = "user")
-    @JsonIgnore
-    private  List<Notification> userNotifications;
 
     private String name;
 
@@ -46,14 +43,6 @@ public class User {
 
     }
 
-    public User(Long id, String email, String password, LocalDateTime createdAt, List<Schedule> userSchedule, List<Notification> userNotifications) {
-        this.id = id;
-        this.email = email;
-        this.password = password;
-        this.createdAt = createdAt;
-        this.userSchedule = userSchedule;
-        this.userNotifications = userNotifications;
-    }
 
 
     public Long getId() {
@@ -105,13 +94,6 @@ public class User {
         this.name = name;
     }
 
-    public List<Notification> getUserNotifications() {
-        return userNotifications;
-    }
-
-    public void setUserNotifications(List<Notification> userNotifications) {
-        this.userNotifications = userNotifications;
-    }
 
     @Override
     public String toString() {
@@ -121,7 +103,6 @@ public class User {
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", userSchedule=" + userSchedule +
-                ", userNotifications=" + userNotifications +
                 ", name='" + name + '\'' +
                 '}';
     }

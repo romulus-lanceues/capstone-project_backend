@@ -4,8 +4,12 @@ import com.mediciationbox.capstone.medication_app.dto.ResponseDTO;
 import com.mediciationbox.capstone.medication_app.exception.AccountAlreadyExistsException;
 import com.mediciationbox.capstone.medication_app.exception.NoExistingAccountException;
 import com.mediciationbox.capstone.medication_app.exception.WrongPasswordException;
+import com.mediciationbox.capstone.medication_app.model.ActiveUser;
 import com.mediciationbox.capstone.medication_app.model.User;
+import com.mediciationbox.capstone.medication_app.repository.ActiveUserRepository;
 import com.mediciationbox.capstone.medication_app.repository.UserRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -16,10 +20,12 @@ public class UserAuthenticationService {
 
     private UserRepository userRepository;
     private JWTService jwtService;
+    private ActiveUserRepository activeUserRepository;
 
-    public UserAuthenticationService(UserRepository userRepository, JWTService jwtService){
+    public UserAuthenticationService(UserRepository userRepository, JWTService jwtService, ActiveUserRepository activeUserRepository){
         this.userRepository = userRepository;
         this.jwtService = jwtService;
+        this.activeUserRepository = activeUserRepository;
     }
 
     public void ifAlreadyExists(String email){
@@ -39,6 +45,11 @@ public class UserAuthenticationService {
         if(account == null) throw new NoExistingAccountException("No registered account for " + email);
         if(!password.equals(account.getPassword())) throw new WrongPasswordException("Enter the right password.");
 
+        //Tell the database this is the active user
+        ActiveUser activeAccount = activeUserRepository.findByUserId(account.getId());
+        activeAccount.setActive(true);
+        activeUserRepository.save(activeAccount);
+
         String token = jwtService.generateToken(email);
 
         Map<String, Object> details = new HashMap<>();
@@ -56,6 +67,8 @@ public class UserAuthenticationService {
         //generate token
         String token = jwtService.generateToken(account.getEmail());
 
+        createActiveUserEntryForAccount(account);
+
         Map<String, Object> accountInfos = new HashMap<>();
 
         accountInfos.put("id", String.valueOf(account.getId()));
@@ -63,9 +76,20 @@ public class UserAuthenticationService {
         accountInfos.put("name", account.getName());
         accountInfos.put("token", token);
 
-
-
         return new ResponseDTO(true, "success", accountInfos);
     }
 
+    private ActiveUser createActiveUserEntryForAccount(User account){
+        ActiveUser createdLoginSession = new ActiveUser(account.getEmail(), account.getId(), true);
+        activeUserRepository.save(createdLoginSession);
+        return createdLoginSession;
+    }
+
+    public ResponseEntity<?> logoutService(Long userId){
+        ActiveUser activeUser = activeUserRepository.findByUserId(userId);
+        activeUser.setActive(false);
+        activeUserRepository.save(activeUser);
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+    }
 }

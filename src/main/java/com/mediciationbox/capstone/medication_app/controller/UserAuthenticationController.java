@@ -71,12 +71,17 @@ public class UserAuthenticationController {
 
     //Select by ID controller
     @GetMapping("/api/users/{id}")
-    public ResponseEntity<Object> getById(@PathVariable Long id){
-
+    public ResponseEntity<?> getById(@PathVariable Long id){
         Optional<User> account = userRepository.findById(id);
 
         return new ResponseEntity<>(account, HttpStatus.ACCEPTED);
 
+    }
+
+    //Logout a user
+    @PostMapping("/api/logout/{userId}")
+    public ResponseEntity<?> logoutActiveUser(@PathVariable Long userId){
+        return userAuthenticationService.logoutService(userId);
     }
 
 
