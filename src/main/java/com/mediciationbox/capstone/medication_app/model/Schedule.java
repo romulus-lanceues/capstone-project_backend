@@ -43,6 +43,10 @@ public class Schedule {
     @JsonIgnore
     private List<Schedule> childSchedules;
 
+    @OneToMany(mappedBy = "parentScheduleForNotif")
+    @JsonIgnore
+    private List<Notification> notifications;
+
     private boolean isGenerated = false;
 
 
@@ -176,6 +180,13 @@ public class Schedule {
         this.parentSchedule = parentSchedule;
     }
 
+    public List<Notification> getNotifications() {
+        return notifications;
+    }
+
+    public void setNotifications(List<Notification> notifications) {
+        this.notifications = notifications;
+    }
 
     @Override
     public String toString() {
@@ -193,4 +204,6 @@ public class Schedule {
                 ", isGenerated=" + isGenerated +
                 '}';
     }
+
+
 }
