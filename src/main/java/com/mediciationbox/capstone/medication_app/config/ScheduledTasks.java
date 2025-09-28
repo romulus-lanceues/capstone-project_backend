@@ -8,6 +8,7 @@ import com.mediciationbox.capstone.medication_app.model.Notification;
 import com.mediciationbox.capstone.medication_app.model.Schedule;
 import com.mediciationbox.capstone.medication_app.repository.ActiveUserRepository;
 import com.mediciationbox.capstone.medication_app.repository.NotificationRepository;
+import com.mediciationbox.capstone.medication_app.repository.ScheduleRepository;
 import com.mediciationbox.capstone.medication_app.service.EmailService;
 import com.mediciationbox.capstone.medication_app.service.ScheduleService;
 import jakarta.persistence.EntityManager;
@@ -31,16 +32,19 @@ public class ScheduledTasks {
     private final NotificationRepository notificationRepository;
     private EntityManager entityManager;
     private List<Schedule> schedulesForToday;
+    private final ScheduleRepository scheduleRepository;
 
 
     public ScheduledTasks(ScheduleService scheduleService,
                           ActiveUserRepository activeUserRepository, EmailService emailService,
-                          NotificationRepository notificationRepository, EntityManager entityManager){
+                          NotificationRepository notificationRepository, EntityManager entityManager,
+                          ScheduleRepository scheduleRepository){
         this.scheduleService = scheduleService;
         this.activeUserRepository = activeUserRepository;
         this.emailService = emailService;
         this.notificationRepository = notificationRepository;
         this.entityManager = entityManager;
+        this.scheduleRepository = scheduleRepository;
     }
 
     //Automate Schedule creation for a new day
@@ -113,5 +117,32 @@ public class ScheduledTasks {
 
     public void setSchedulesForToday(List<Schedule> schedulesForToday) {
         this.schedulesForToday = schedulesForToday;
+    }
+
+    //Logic responsible for triggering the NodeMCU buzzer
+    @Transactional
+    @Scheduled(fixedDelay = 30000) //Check every 30 seconds
+    public void triggerNodeBuzzer() {
+
+        //Check if current schedules is not empty
+        if (schedulesForToday == null || schedulesForToday.isEmpty()) {
+            return;
+        }
+
+        LocalDateTime currentDate = LocalDateTime.now();
+
+        schedulesForToday.stream().forEach(schedule -> {
+
+            Schedule currentSchedule = entityManager.merge(schedule);
+
+            if (currentDate.toLocalTime().withSecond(0).equals(currentSchedule.getTimeOfIntake().toLocalTime())){
+                if (!currentSchedule.getBuzzerTriggered()) {
+                    //Tell Node to trigger the buzzer
+                    currentSchedule.setBuzzerTriggered(true);
+                    scheduleRepository.save(currentSchedule);
+
+                }
+            };
+        });
     }
 }

@@ -49,6 +49,9 @@ public class Schedule {
 
     private boolean isGenerated = false;
 
+    @Column(name = "buzzer_triggered", nullable = false)
+    private Boolean buzzerTriggered = false;
+
 
     public Schedule(){
 
@@ -188,22 +191,11 @@ public class Schedule {
         this.notifications = notifications;
     }
 
-    @Override
-    public String toString() {
-        return "Schedule{" +
-                "childSchedules=" + childSchedules +
-                ", id=" + id +
-                ", name='" + name + '\'' +
-                ", timeOfIntake=" + timeOfIntake +
-                ", frequency='" + frequency + '\'' +
-                ", duration=" + duration +
-                ", notes='" + notes + '\'' +
-                ", done=" + done +
-                ", user=" + user +
-                ", parentSchedule=" + parentSchedule +
-                ", isGenerated=" + isGenerated +
-                '}';
+    public Boolean getBuzzerTriggered() {
+        return buzzerTriggered;
     }
 
-
+    public void setBuzzerTriggered(Boolean buzzerTriggered) {
+        this.buzzerTriggered = buzzerTriggered;
+    }
 }
