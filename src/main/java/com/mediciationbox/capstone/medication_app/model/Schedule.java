@@ -198,4 +198,21 @@ public class Schedule {
     public void setBuzzerTriggered(Boolean buzzerTriggered) {
         this.buzzerTriggered = buzzerTriggered;
     }
+
+    @Override
+    public String toString() {
+        return "Schedule{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", timeOfIntake=" + timeOfIntake +
+                ", frequency='" + frequency + '\'' +
+                ", duration=" + duration +
+                ", notes='" + notes + '\'' +
+                ", done=" + done +
+                ", isGenerated=" + isGenerated +
+                ", buzzerTriggered=" + buzzerTriggered +
+                ", userId=" + (user != null ? user.getId() : null) +
+                ", parentScheduleId=" + (parentSchedule != null ? parentSchedule.getId() : null) +
+                '}';
+    }
 }
