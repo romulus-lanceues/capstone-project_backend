@@ -32,7 +32,7 @@ public class User {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user" )
     @JsonIgnore
     private List<Schedule> userSchedule;
 

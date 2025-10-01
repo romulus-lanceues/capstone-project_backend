@@ -32,7 +32,7 @@ public class ScheduledTasks {
     private final Logger log = LoggerFactory.getLogger(ScheduledTasks.class);
     private final EmailService emailService;
     private final NotificationRepository notificationRepository;
-    private EntityManager entityManager;
+    private final EntityManager entityManager;
     private List<Schedule> schedulesForToday;
     private final ScheduleRepository scheduleRepository;
     private final NodeMCUService nodeMCUService;
@@ -146,7 +146,6 @@ public class ScheduledTasks {
 
             Schedule currentSchedule = entityManager.merge(schedule);
 
-            log.info("{}",currentSchedule);
 
             if (currentDate.truncatedTo(ChronoUnit.MINUTES).equals(currentSchedule.getTimeOfIntake().truncatedTo(ChronoUnit.MINUTES))){
                 if (!currentSchedule.getBuzzerTriggered()) {

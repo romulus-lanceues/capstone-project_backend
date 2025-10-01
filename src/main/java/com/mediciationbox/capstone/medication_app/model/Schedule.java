@@ -43,7 +43,7 @@ public class Schedule {
     @JsonIgnore
     private List<Schedule> childSchedules;
 
-    @OneToMany(mappedBy = "parentScheduleForNotif")
+    @OneToMany(mappedBy = "parentScheduleForNotif", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Notification> notifications;
 

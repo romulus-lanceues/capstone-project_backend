@@ -23,8 +23,8 @@ import java.util.stream.Collectors;
 @Service
 public class ScheduleService {
 
-    private UserRepository userRepository;
-    private ScheduleRepository scheduleRepository;
+    private final UserRepository userRepository;
+    private final ScheduleRepository scheduleRepository;
 
     //Development Event Publisher
     private final ApplicationEventPublisher applicationEventPublisher;
@@ -71,6 +71,7 @@ public class ScheduleService {
             //Switch
             switch (schedule.getFrequency()){
                 case "daily":
+                    //This logic is under testing
                     LocalDateTime scheduleEndForDaily = schedule.getTimeOfIntake().plusDays(schedule.getDuration());
                     return !currentDate.toLocalDate().isBefore(startingDate.toLocalDate()) && !currentDate.toLocalDate().isAfter(scheduleEndForDaily.toLocalDate());
 
