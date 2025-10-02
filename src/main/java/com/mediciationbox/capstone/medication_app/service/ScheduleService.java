@@ -72,7 +72,7 @@ public class ScheduleService {
             switch (schedule.getFrequency()){
                 case "daily":
                     //This logic is under testing
-                    LocalDateTime scheduleEndForDaily = schedule.getTimeOfIntake().plusDays(schedule.getDuration());
+                    LocalDateTime scheduleEndForDaily = schedule.getTimeOfIntake().plusDays(schedule.getDuration() - 1);
                     return !currentDate.toLocalDate().isBefore(startingDate.toLocalDate()) && !currentDate.toLocalDate().isAfter(scheduleEndForDaily.toLocalDate());
 
                 case "weekly":
