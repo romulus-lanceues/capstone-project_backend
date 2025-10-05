@@ -105,4 +105,5 @@ public class ScheduleController {
         ResponseDTO responseDTO = new ResponseDTO(true, "Success", Map.of("isDeleted", true));
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
+
 }

@@ -15,6 +15,7 @@ public class Notification {
     private String notificationName;
     private LocalDateTime scheduleTime;
     private LocalDateTime timeSent;
+    private Long userId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
@@ -71,13 +72,11 @@ public class Notification {
         this.scheduleTime = scheduleTime;
     }
 
-    @Override
-    public String toString() {
-        return "Notification{" +
-                "id=" + id +
-                ", notificationName='" + notificationName + '\'' +
-                ", timeSent=" + timeSent +
-                ", parentScheduleForNotif=" + parentScheduleForNotif +
-                '}';
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 }

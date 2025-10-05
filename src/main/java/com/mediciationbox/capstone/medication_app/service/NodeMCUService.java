@@ -14,7 +14,7 @@ import java.time.Duration;
 public class NodeMCUService {
 
     private static final Logger log = LoggerFactory.getLogger(NodeMCUService.class);
-    @Value("${nodemcu.ip.address:192.168.1.5}")
+    @Value("${nodemcu.ip.address:192.168.1.10}")
     private String nodeMCUIpAddress;
 
     private final RestTemplate restTemplate;

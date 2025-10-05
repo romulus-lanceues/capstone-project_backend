@@ -104,6 +104,9 @@ public class ScheduledTasks {
                     try{
                         emailService.sendEmailNotification(currentSchedule.getUser().getEmail(), currentSchedule.getName());
                         Notification notification = new Notification(currentSchedule.getName(),currentSchedule.getTimeOfIntake(), currentSchedule, LocalDateTime.now());
+                        //Retrieve the active user ID and insert it to the new notification entry
+                        ActiveUser activeUser = activeUserRepository.findByActiveStatus();
+                        notification.setUserId(activeUser.getUserId());
                         notificationRepository.save(notification);
                     }
                     //To be updated
@@ -125,7 +128,7 @@ public class ScheduledTasks {
 
     //Logic responsible for triggering the NodeMCU buzzer
     @Transactional
-    @Scheduled(fixedDelay = 30000) //Check every 30 seconds
+    @Scheduled(fixedDelay = 45000) //Check every 45 seconds
     public void triggerNodeBuzzer() {
 
         log.info("trigger method working.");

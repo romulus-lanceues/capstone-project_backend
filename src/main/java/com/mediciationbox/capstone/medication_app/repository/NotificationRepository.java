@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface NotificationRepository extends JpaRepository<Notification, Integer> {
@@ -13,4 +14,7 @@ public interface NotificationRepository extends JpaRepository<Notification, Inte
     //Using a JPQL Query
 //    @Query("SELECT s from Notification s WHERE s.name = :name AND s.scheduleTime = :scheduleTime")
 //    Optional<Notification> findANotification(@Param("scheduleName") String scheduleName, @Param("scheduleTime") LocalDateTime scheduleTime);
+
+    @Query("SELECT n from Notification n WHERE n.userId = userId")
+    List<Notification> getAllNotificationsForUser (@Param("userId") Long userId);
 }
