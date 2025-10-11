@@ -45,6 +45,7 @@ public class Schedule {
 
     @OneToMany(mappedBy = "parentScheduleForNotif", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
+    @org.hibernate.annotations.BatchSize(size = 20)  // Fetch notifications in batches to avoid N+1
     private List<Notification> notifications;
 
     private boolean isGenerated = false;

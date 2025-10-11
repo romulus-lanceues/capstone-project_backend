@@ -5,6 +5,10 @@ import com.mediciationbox.capstone.medication_app.dto.ResponseDTO;
 import com.mediciationbox.capstone.medication_app.model.User;
 import com.mediciationbox.capstone.medication_app.repository.UserRepository;
 import com.mediciationbox.capstone.medication_app.service.UserAuthenticationService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -28,8 +32,12 @@ public class UserAuthenticationController {
     }
 
     @GetMapping("/api/signup/user")
-    public List<User> users(){
-        return userRepository.findAll();
+    public Page<User> users(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size
+    ){
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        return userRepository.findAll(pageable);
     }
 
     //Initial Signup

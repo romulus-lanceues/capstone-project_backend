@@ -75,7 +75,7 @@ public class ScheduledTasks {
 
 
     @Transactional
-    @Scheduled(fixedDelay = 10000)
+    @Scheduled(cron = "0 * * * * *")  // Runs at exactly 0 seconds of every minute (e.g., 09:31:00, 09:32:00)
     public void sendNotification(){
         if(schedulesForToday == null || schedulesForToday.isEmpty()){
             return;
@@ -95,8 +95,8 @@ public class ScheduledTasks {
 
             LocalDateTime scheduleTime = currentSchedule.getTimeOfIntake();
 
-            //FIX THIS LOGIC ASAP
-            if(currentTime.equals(scheduleTime.minusMinutes(2)) || (currentTime.isAfter(scheduleTime.minusMinutes(2))) && currentTime.isBefore(scheduleTime)){
+            // Send notification exactly 3 minutes before schedule time (since we run at exact minutes)
+            if(currentTime.truncatedTo(ChronoUnit.MINUTES).equals(scheduleTime.minusMinutes(3).truncatedTo(ChronoUnit.MINUTES))){
                 //Check if this schedule already produced a notification.
                 List<Notification> notifications = currentSchedule.getNotifications();
 
@@ -108,6 +108,7 @@ public class ScheduledTasks {
                         ActiveUser activeUser = activeUserRepository.findByActiveStatus();
                         notification.setUserId(activeUser.getUserId());
                         notificationRepository.save(notification);
+                        log.info("Email notification sent for: {} at {}", currentSchedule.getName(), LocalDateTime.now());
                     }
                     //To be updated
                     catch(Exception e){
@@ -115,7 +116,7 @@ public class ScheduledTasks {
                     }
                 }
                 else {
-                    log.info("A notification was already sent");
+                    log.debug("A notification was already sent for: {}", currentSchedule.getName());
                 }
 
             }
@@ -128,10 +129,10 @@ public class ScheduledTasks {
 
     //Logic responsible for triggering the NodeMCU buzzer
     @Transactional
-    @Scheduled(fixedDelay = 45000) //Check every 45 seconds
+    @Scheduled(cron = "0 * * * * *")  // Runs at exactly 0 seconds of every minute (e.g., 09:31:00, 09:32:00)
     public void triggerNodeBuzzer() {
 
-        log.info("trigger method working.");
+        log.debug("Buzzer trigger check running...");
 
         /**
          * The schedule time doesn't include seconds
@@ -140,6 +141,7 @@ public class ScheduledTasks {
 
         //Check if current schedules is not empty
         if (schedulesForToday == null || schedulesForToday.isEmpty()) {
+            log.debug("No schedules for today, skipping buzzer check");
             return;
         }
 
