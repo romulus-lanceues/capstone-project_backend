@@ -58,6 +58,8 @@ public class UserAuthenticationController {
     //Signup for creating the user account
     @PostMapping("/api/add_user")
     public ResponseEntity<ResponseDTO> addNewUser(@Validated @RequestBody User user){
+        //Create a hash logic
+
         userRepository.save(user);
 
         //Create a service method

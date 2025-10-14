@@ -1,9 +1,9 @@
 spring.application.name=medication-app
 
 #Supabase Credentials
-spring.datasource.url=jdbc:postgresql://aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres
-spring.datasource.username=postgres.yxztfdngdleowjbrnmxq
-spring.datasource.password=QUAntum#2004-
+spring.datasource.url=jdbc:postgresql://YOUR_SUPABASE_URL:5432/postgres
+spring.datasource.username=YOUR_SUPABASE_USERNAME
+spring.datasource.password=YOUR_SUPABASE_PASSWORD
 
 #JPA Settings
 spring.jpa.hibernate.ddl-auto=update
@@ -11,16 +11,16 @@ spring.jpa.show.sql=true
 spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
 
 #SignatureForJWT
-jwt.secret=LoremIpsumKamsamhamnidaDeLaHoyaBonjourNiHaoKunichiwaDaiskiArigato
+jwt.secret=YOUR_JWT_SECRET_KEY_HERE_AT_LEAST_64_CHARACTERS_LONG
 
 # Gmail SMTP Configuration
 spring.mail.host=smtp.gmail.com
 spring.mail.port=587
-spring.mail.username=teammedicationapp@gmail.com
-spring.mail.password=ijrq qzbl tfjb sfcr 
+spring.mail.username=YOUR_EMAIL@gmail.com
+spring.mail.password=YOUR_APP_PASSWORD
 spring.mail.properties.mail.smtp.auth=true
 spring.mail.properties.mail.smtp.starttls.enable=true
 spring.mail.properties.mail.smtp.starttls.required=true
 
 #NodeMCU info
-nodemcu.ip.address=192.168.1.8
+nodemcu.ip.address=192.168.1.10

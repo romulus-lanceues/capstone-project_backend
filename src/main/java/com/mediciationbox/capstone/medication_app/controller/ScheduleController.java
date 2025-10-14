@@ -43,10 +43,10 @@ public class ScheduleController {
     public ResponseEntity<ResponseDTO>
     addSchedule(@RequestBody AddScheduleDTO addScheduleDTO, @RequestHeader("Authorization") String authHeader){
 
-//        jwtService.checkIfTokenIsEmpty(authHeader); //Throws an exception if not valid
-//
-//        //Throws a runtime exception if an error is encountered
-//        jwtService.validateToken(authHeader);
+        // jwtService.checkIfTokenIsEmpty(authHeader); //Throws an exception if not valid
+
+        // //Throws a runtime exception if an error is encountered
+        // jwtService.validateToken(authHeader);
 
         Schedule schedule = scheduleService.createSchedule(addScheduleDTO);
 

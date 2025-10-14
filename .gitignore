@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Security - Don't commit credentials ###
+src/main/resources/application.properties
