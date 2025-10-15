@@ -10,6 +10,7 @@ import com.mediciationbox.capstone.medication_app.repository.ActiveUserRepositor
 import com.mediciationbox.capstone.medication_app.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -21,11 +22,14 @@ public class UserAuthenticationService {
     private UserRepository userRepository;
     private JWTService jwtService;
     private ActiveUserRepository activeUserRepository;
+    private PasswordEncoder passwordEncoder;
 
-    public UserAuthenticationService(UserRepository userRepository, JWTService jwtService, ActiveUserRepository activeUserRepository){
+    public UserAuthenticationService(UserRepository userRepository, JWTService jwtService,
+                                     ActiveUserRepository activeUserRepository, PasswordEncoder passwordEncoder){
         this.userRepository = userRepository;
         this.jwtService = jwtService;
         this.activeUserRepository = activeUserRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public void ifAlreadyExists(String email){
@@ -43,7 +47,7 @@ public class UserAuthenticationService {
 
         //Validate credentials
         if(account == null) throw new NoExistingAccountException("No registered account for " + email);
-        if(!password.equals(account.getPassword())) throw new WrongPasswordException("Enter the right password.");
+        if(!passwordEncoder.matches(password, account.getPassword())) throw new WrongPasswordException("Enter the right password.");
 
         //Tell the database this is the active user
         ActiveUser activeAccount = activeUserRepository.findByUserId(account.getId());

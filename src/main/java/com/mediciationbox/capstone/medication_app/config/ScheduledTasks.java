@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -133,7 +134,6 @@ public class ScheduledTasks {
     public void triggerNodeBuzzer() {
 
         log.debug("Buzzer trigger check running...");
-
         /**
          * The schedule time doesn't include seconds
          */
@@ -147,10 +147,18 @@ public class ScheduledTasks {
 
         LocalDateTime currentDate = LocalDateTime.now();
 
-        schedulesForToday.stream().forEach(schedule -> {
-
-            Schedule currentSchedule = entityManager.merge(schedule);
-
+        // Collect schedule IDs that need buzzer trigger to avoid detached entity issues
+        List<Integer> scheduleIdsToUpdate = new ArrayList<>();
+        
+        for (Schedule schedule : schedulesForToday) {
+            // Re-fetch from database to ensure we have the latest state
+            Schedule currentSchedule = scheduleRepository.findById(schedule.getId())
+                    .orElse(null);
+            
+            if (currentSchedule == null) {
+                log.warn("Schedule with ID {} not found in database", schedule.getId());
+                continue;
+            }
 
             if (currentDate.truncatedTo(ChronoUnit.MINUTES).equals(currentSchedule.getTimeOfIntake().truncatedTo(ChronoUnit.MINUTES))){
                 if (!currentSchedule.getBuzzerTriggered()) {
@@ -159,6 +167,7 @@ public class ScheduledTasks {
                         nodeMCUService.triggerBuzzer(currentSchedule.getName());
                         currentSchedule.setBuzzerTriggered(true);
                         scheduleRepository.save(currentSchedule);
+                        scheduleIdsToUpdate.add(currentSchedule.getId());
 
                         log.info("Buzzer triggered for: {} at {}",
                                 currentSchedule.getName(),
@@ -170,7 +179,13 @@ public class ScheduledTasks {
                 else {
                     log.debug("Buzzer already triggered for: {}", currentSchedule.getName());
                 }
-            };
-        });
+            }
+        }
+        
+        // Force flush to ensure database is updated
+        if (!scheduleIdsToUpdate.isEmpty()) {
+            entityManager.flush();
+            log.debug("Flushed {} buzzer updates to database", scheduleIdsToUpdate.size());
+        }
     }
 }

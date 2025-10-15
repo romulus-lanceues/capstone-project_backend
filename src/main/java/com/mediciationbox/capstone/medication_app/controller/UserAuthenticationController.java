@@ -1,5 +1,6 @@
 package com.mediciationbox.capstone.medication_app.controller;
 
+
 import com.mediciationbox.capstone.medication_app.dto.LogInDTO;
 import com.mediciationbox.capstone.medication_app.dto.ResponseDTO;
 import com.mediciationbox.capstone.medication_app.model.User;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,10 +27,14 @@ public class UserAuthenticationController {
 
     private UserRepository userRepository;
     private UserAuthenticationService userAuthenticationService;
+    private PasswordEncoder passwordEncoder;
 
-    public UserAuthenticationController(UserRepository userRepository, UserAuthenticationService userAuthenticationService){
+    public UserAuthenticationController(UserRepository userRepository, UserAuthenticationService userAuthenticationService,
+                                        PasswordEncoder passwordEncoder){
         this.userRepository = userRepository;
         this.userAuthenticationService = userAuthenticationService;
+        this.passwordEncoder = passwordEncoder;
+
     }
 
     @GetMapping("/api/signup/user")
@@ -41,14 +47,17 @@ public class UserAuthenticationController {
     }
 
     //Initial Signup
+    /*
+    Utilize the existing LogInDTO to catch the credentials submitted by the frontend.
+     */
     @PostMapping("/api/signup/user")
-    public ResponseEntity<ResponseDTO> signup(@Validated @RequestBody User user){
+    public ResponseEntity<ResponseDTO> signup(@Validated @RequestBody LogInDTO userCred){
 
-        userAuthenticationService.ifAlreadyExists(user.getEmail());
+        userAuthenticationService.ifAlreadyExists(userCred.email());
 
         Map<String, Object> details = new HashMap<>();
-        details.put("email", user.getEmail());
-        details.put("password",user.getPassword());
+        details.put("email", userCred.email());
+        details.put("password", userCred.password());
         ResponseDTO response = new ResponseDTO(true, "success", details );
 
         return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
@@ -58,8 +67,9 @@ public class UserAuthenticationController {
     //Signup for creating the user account
     @PostMapping("/api/add_user")
     public ResponseEntity<ResponseDTO> addNewUser(@Validated @RequestBody User user){
-        //Create a hash logic
-
+        //Hash logic
+        String hashedPassword = passwordEncoder.encode(user.getPassword());
+        user.setPassword(hashedPassword);
         userRepository.save(user);
 
         //Create a service method
