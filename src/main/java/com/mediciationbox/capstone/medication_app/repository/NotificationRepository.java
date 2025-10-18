@@ -15,6 +15,6 @@ public interface NotificationRepository extends JpaRepository<Notification, Inte
 //    @Query("SELECT s from Notification s WHERE s.name = :name AND s.scheduleTime = :scheduleTime")
 //    Optional<Notification> findANotification(@Param("scheduleName") String scheduleName, @Param("scheduleTime") LocalDateTime scheduleTime);
 
-    @Query("SELECT n from Notification n WHERE n.userId = userId")
-    List<Notification> getAllNotificationsForUser (@Param("userId") Long userId);
+@Query("SELECT n FROM Notification n WHERE n.userId = :userId")
+List<Notification> getAllNotificationsForUser(@Param("userId") Long userId);
 }

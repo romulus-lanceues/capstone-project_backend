@@ -3,6 +3,7 @@ package com.mediciationbox.capstone.medication_app.controller;
 import com.mediciationbox.capstone.medication_app.dto.ResponseDTO;
 import com.mediciationbox.capstone.medication_app.model.Notification;
 import com.mediciationbox.capstone.medication_app.repository.NotificationRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,5 +22,13 @@ public class NotificationController {
     @GetMapping("/api/get-notifications/{id}")
     public ResponseEntity<?> getNotifications(@PathVariable Long id){
         return ResponseEntity.ok(notificationRepository.getAllNotificationsForUser(id));
+    }
+
+    //Catch ESP 32's notification
+    @GetMapping("/api/notify-backend/medication-taken")
+    public ResponseEntity<String> medicationTaken(){
+        System.out.println("Notification received");
+
+        return ResponseEntity.status(HttpStatus.OK).body("Medication taken");
     }
 }

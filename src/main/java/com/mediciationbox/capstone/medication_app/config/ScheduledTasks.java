@@ -3,6 +3,7 @@ package com.mediciationbox.capstone.medication_app.config;
 
 
 import com.mediciationbox.capstone.medication_app.dto.SchedulesForTodayEvent;
+import com.mediciationbox.capstone.medication_app.exception.NoExistingScheduleException;
 import com.mediciationbox.capstone.medication_app.model.ActiveUser;
 import com.mediciationbox.capstone.medication_app.model.Notification;
 import com.mediciationbox.capstone.medication_app.model.Schedule;
@@ -25,6 +26,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class ScheduledTasks {
@@ -88,10 +90,17 @@ public class ScheduledTasks {
             /*
             Schedules are collected in a different class and there's no active hibernate connection here.
             Reattaching / Re-fetching is the appropriate solution.
+
+            ***This can overwrite updated data******
+
+            Schedule currentSchedule = entityManager.merge(schedule);
             */
 
-            Schedule currentSchedule = entityManager.merge(schedule); //Use this for consistency
-            //Keep the hibernate connection open using @Transactional
+            //Get the id
+            Optional<Schedule> retrievedSchedule = scheduleRepository.findById(schedule.getId());
+
+            //Check if it's empty for safety
+            Schedule currentSchedule = retrievedSchedule.orElseThrow(() -> new NoExistingScheduleException("No existing found to send notification"));
 
 
             LocalDateTime scheduleTime = currentSchedule.getTimeOfIntake();
@@ -188,4 +197,8 @@ public class ScheduledTasks {
             log.debug("Flushed {} buzzer updates to database", scheduleIdsToUpdate.size());
         }
     }
+
+    //Auto update the done value of a schedule for today based on intake table
+
+
 }
