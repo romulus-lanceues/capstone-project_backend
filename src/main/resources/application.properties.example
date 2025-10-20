@@ -23,4 +23,4 @@ spring.mail.properties.mail.smtp.starttls.enable=true
 spring.mail.properties.mail.smtp.starttls.required=true
 
 #NodeMCU info
-nodemcu.ip.address=192.168.1.10
+nodemcu.ip.address=esp32-sensor.local
