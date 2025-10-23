@@ -39,7 +39,7 @@ public class EmailService {
         helper.setSubject("💊 " + medicationName + " - Medication Reminder");
         helper.setFrom("teammedicationapp@gmail.com");
         
-        String htmlContent = createStyledEmailTemplate(medicationName, "It's time to take your scheduled medication!");
+        String htmlContent = createStyledEmailTemplate(medicationName, "It's time to take your scheduled medication soon!");
         helper.setText(htmlContent, true);
         
         mailSender.send(message);
