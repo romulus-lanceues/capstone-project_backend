@@ -1,6 +1,23 @@
 # Medication Reminder App - Backend
 
+[![Java Version](https://img.shields.io/badge/Java-21-blue.svg)](https://www.oracle.com/java/technologies/javase/jdk21-archive-downloads.html)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.5-brightgreen.svg)](https://spring.io/projects/spring-boot)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+
 A Spring Boot backend application for managing medication schedules with automated email notifications and IoT device integration (NodeMCU buzzer).
+
+## 📑 Table of Contents
+- [Features](#-features)
+- [Technology Stack](#-technology-stack)
+- [Prerequisites](#-prerequisites)
+- [Getting Started](#-getting-started)
+- [API Documentation](#-api-documentation)
+- [Database Schema](#-database-schema)
+- [Scheduled Tasks](#-scheduled-tasks)
+- [IoT Integration](#-iot-integration)
+- [Troubleshooting](#-troubleshooting)
+- [Contributing](#-contributing)
+- [License](#-license)
 
 ## 📋 Features
 
@@ -32,78 +49,104 @@ A Spring Boot backend application for managing medication schedules with automat
 
 ## 🚀 Getting Started
 
-### 1. Clone the Repository
+### 1. Prerequisites
+
+- Java 21 JDK
+- Maven 3.6+
+- PostgreSQL 13+ (or Supabase account)
+- Gmail account with [App Password](https://support.google.com/accounts/answer/185833?hl=en) enabled
+- (Optional) NodeMCU device for buzzer functionality
+
+### 2. Clone the Repository
 
 ```bash
 git clone <your-repo-url>
-cd medication-app
+cd test-backend
 ```
 
-### 2. Configure Application Properties
+### 3. Database Setup
 
-Copy the example properties file:
+1. Create a new PostgreSQL database or use Supabase
+2. Update the database configuration in `application.properties`
 
+### 4. Configure Application
+
+1. Copy the example properties file:
+   ```bash
+   cp src/main/resources/application.properties.example src/main/resources/application.properties
+   ```
+
+2. Edit `application.properties` with your credentials:
+   ```properties
+   # Server
+   server.port=8080
+   
+   # Database
+   spring.datasource.url=jdbc:postgresql://YOUR_SUPABASE_URL:5432/postgres
+   spring.datasource.username=YOUR_USERNAME
+   spring.datasource.password=YOUR_PASSWORD
+   spring.jpa.hibernate.ddl-auto=update
+   
+   # JWT
+   jwt.secret=YOUR_64_CHAR_SECRET_KEY_AT_LEAST_64_CHARACTERS_LONG
+   jwt.expiration=86400000  # 24 hours in milliseconds
+   
+   # Email (Gmail SMTP)
+   spring.mail.host=smtp.gmail.com
+   spring.mail.port=587
+   spring.mail.username=YOUR_EMAIL@gmail.com
+   spring.mail.password=YOUR_APP_PASSWORD
+   spring.mail.properties.mail.smtp.auth=true
+   spring.mail.properties.mail.smtp.starttls.enable=true
+   
+   # NodeMCU (optional)
+   nodemcu.ip.address=192.168.1.10
+   ```
+
+### 5. Build and Run
+
+1. Build the project:
+   ```bash
+   mvn clean install
+   ```
+
+2. Run the application:
+   ```bash
+   mvn spring-boot:run
+   ```
+
+The application will be available at `http://localhost:8080`
+
+### 6. Verify Installation
+
+Check if the application is running:
 ```bash
-cp src/main/resources/application.properties.example src/main/resources/application.properties
+curl http://localhost:8080/api/health
 ```
 
-Edit `application.properties` with your credentials:
+You should receive a response with the application status.
 
-```properties
-# Database
-spring.datasource.url=jdbc:postgresql://YOUR_SUPABASE_URL:5432/postgres
-spring.datasource.username=YOUR_USERNAME
-spring.datasource.password=YOUR_PASSWORD
-
-# JWT Secret (minimum 64 characters)
-jwt.secret=YOUR_SECRET_KEY
-
-# Gmail SMTP
-spring.mail.username=YOUR_EMAIL@gmail.com
-spring.mail.password=YOUR_APP_PASSWORD
-
-# NodeMCU IP (optional)
-nodemcu.ip.address=192.168.1.10
-```
-
-### 3. Build the Project
-
-```bash
-mvn clean install
-```
-
-### 4. Run the Application
-
-```bash
-mvn spring-boot:run
-```
-
-The application will start on `http://localhost:8080`
-
-## 📚 API Endpoints
+## 📚 API Documentation
 
 ### Authentication
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| POST | `/api/signup/user` | Validate signup credentials | No |
-| POST | `/api/add_user` | Create new user account | No |
-| POST | `/api/login/user` | Login user | No |
-| POST | `/api/logout/{userId}` | Logout user | No |
-| GET | `/api/users/{id}` | Get user by ID | No |
-| GET | `/api/signup/user` | List all users (paginated) | No |
+| Method | Endpoint | Description | Request Body | Auth Required |
+|--------|----------|-------------|--------------|---------------|
+| POST | `/api/signup/user` | Validate signup details | `{email, password, ...}` | No |
+| POST | `/api/add_user` | Create new user account | `{email, password, name, ...}` | No |
+| POST | `/api/login/user` | User login | `{email, password}` | No |
+| POST | `/api/logout/{userId}` | User logout | - | Yes |
+| GET | `/api/users/{id}` | Get user by ID | - | Yes |
+| GET | `/api/users` | List all users (paginated) | - | Admin only |
 
 ### Schedules
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| POST | `/api/schedule-upload` | Create new schedule | Yes |
-| GET | `/api/schedule` | Get all schedules (paginated) | No |
-| GET | `/api/schedule/{id}` | Get user's schedules | Yes |
-| GET | `/api/schedule_today/{id}` | Get today's schedules | No |
-| GET | `/api/weekly_history/{id}` | Get 7-day history | No |
-| PATCH | `/api/update-schedule-to-done/{userId}/{scheduleId}` | Mark schedule as done | No |
-| DELETE | `/api/drop-schedule/{scheduleId}` | Delete schedule | No |
+| Method | Endpoint | Description | Request Body | Auth Required |
+|--------|----------|-------------|--------------|---------------|
+| POST | `/api/schedule-upload` | Create new schedule | `{userId, medicationName, ...}` | Yes |
+| GET | `/api/schedules/user/{userId}` | Get user schedules | - | Yes |
+| PUT | `/api/schedules/{id}` | Update schedule | `{medicationName, ...}` | Yes |
+| DELETE | `/api/schedules/{id}` | Delete schedule | - | Yes |
 
 ### Notifications
 
