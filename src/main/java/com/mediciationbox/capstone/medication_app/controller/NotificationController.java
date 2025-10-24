@@ -83,8 +83,10 @@ public class NotificationController {
         schedulesForToday.forEach(schedule -> {
             LocalDateTime scheduleTime = schedule.getTimeOfIntake();
 
-            // Was taken within 15 minutes after reminder
-            if (recordedTime.isAfter(scheduleTime) && recordedTime.isBefore(scheduleTime.plusMinutes(16))) {
+            // Only process schedules that are NOT already completed
+            if (!schedule.isDone() && 
+                recordedTime.isAfter(scheduleTime) && 
+                recordedTime.isBefore(scheduleTime.plusMinutes(16))) {
                 schedule.setDone(true);
                 scheduleRepository.save(schedule);
                 completedSchedules.add(schedule);

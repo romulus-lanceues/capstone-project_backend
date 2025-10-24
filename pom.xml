@@ -46,11 +46,11 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
-      <!--postgres dependency-->
+	<!--mysql dependency-->
 		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<version>42.7.2</version> <!-- Use latest stable -->
+    		<groupId>com.mysql</groupId>
+    		<artifactId>mysql-connector-j</artifactId>
+    		<scope>runtime</scope>
 		</dependency>
 
 		<!--Spring Test Dependency-->
