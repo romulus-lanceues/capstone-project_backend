@@ -255,12 +255,6 @@ src/
 └── test/                    # Test classes
 ```
 
-## 🔐 Security Notes
-
-- JWT tokens expire after 1 hour
-- Passwords are stored in plain text (⚠️ **For demo only - use BCrypt in production**)
-- CORS is configured (check `CorsConfiguration.java`)
-- Sensitive credentials should be in environment variables (not committed to Git)
 
 ## 📝 License
 
@@ -268,7 +262,7 @@ This is a capstone project for educational purposes.
 
 ## 👥 Contributors
 
-- Your Name - Developer
+- Lance Jade A. Buela - Developer
 
 ## 🙏 Acknowledgments
 
@@ -279,4 +273,3 @@ This is a capstone project for educational purposes.
 ---
 
 **Note**: This is a capstone project designed for demonstration purposes. For production deployment, additional security measures (password hashing, rate limiting, HTTPS, etc.) should be implemented.
-w 
