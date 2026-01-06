@@ -18,19 +18,7 @@ public class EmailService {
         this.mailSender = javaMailSender;
     }
 
-    public void sendTestEmail() throws MessagingException {
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-        
-        helper.setTo("ramirezjerraldcliff@gmail.com");
-        helper.setSubject("Test Email - Medication Reminder");
-        helper.setFrom("teammedicationapp@gmail.com");
-        
-        String htmlContent = createStyledEmailTemplate("Test Medication", "Hoy CJ uminom ka na ng gamot");
-        helper.setText(htmlContent, true);
-        
-        mailSender.send(message);
-    }
+
     public void sendEmailNotification(String userEmail, String medicationName) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
