@@ -5,7 +5,7 @@ import com.mediciationbox.capstone.medication_app.exception.AccountAlreadyExists
 import com.mediciationbox.capstone.medication_app.exception.NoExistingAccountException;
 import com.mediciationbox.capstone.medication_app.exception.WrongPasswordException;
 import com.mediciationbox.capstone.medication_app.model.ActiveUser;
-import com.mediciationbox.capstone.medication_app.model.User;
+import com.mediciationbox.capstone.medication_app.entity.User;
 import com.mediciationbox.capstone.medication_app.repository.ActiveUserRepository;
 import com.mediciationbox.capstone.medication_app.repository.UserRepository;
 import org.springframework.http.HttpStatus;

@@ -1,42 +1,42 @@
-package com.mediciationbox.capstone.medication_app.model;
+package com.mediciationbox.capstone.medication_app.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.mediciationbox.capstone.medication_app.model.Notification;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Schedule {
-
-    //Validation
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-
+    @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false)
     private LocalDateTime timeOfIntake;
 
+    @Column(nullable = false)
     private String frequency;
 
+    @Column(nullable = false)
     private Integer duration;
+
+    @Column
     private String notes;
-    private boolean done;
+
+    @Column
+    private boolean done = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnore
+    @JoinColumn(nullable = false)
     private User user;
 
-
-    //Fields for creation of updated schedules
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnore
     private Schedule parentSchedule;
 
     @OneToMany(mappedBy = "parentSchedule", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -50,15 +50,13 @@ public class Schedule {
 
     private boolean isGenerated = false;
 
-    @Column(name = "buzzer_triggered", nullable = false)
+    @Column(nullable = false)
     private Boolean buzzerTriggered = false;
-
 
     public Schedule(){
 
     }
 
-    //Typical constructor
     public Schedule(Integer id, String name, LocalDateTime timeOfIntake, String frequency, Integer duration, String notes, boolean done) {
         this.id = id;
         this.name = name;
@@ -69,7 +67,6 @@ public class Schedule {
         this.done = done;
     }
 
-    //Used for persistence
     public Schedule(String name, LocalDateTime timeOfIntake, String frequency, Integer duration, String notes, boolean done) {
 
         this.name = name;
@@ -93,12 +90,37 @@ public class Schedule {
         this.user = parentSchedule.getUser();
     }
 
+
+    public Boolean getBuzzerTriggered() {
+        return buzzerTriggered;
+    }
+
+    public void setBuzzerTriggered(Boolean buzzerTriggered) {
+        this.buzzerTriggered = buzzerTriggered;
+    }
+
+    public List<Schedule> getChildSchedules() {
+        return childSchedules;
+    }
+
+    public void setChildSchedules(List<Schedule> childSchedules) {
+        this.childSchedules = childSchedules;
+    }
+
     public boolean isDone() {
         return done;
     }
 
     public void setDone(boolean done) {
         this.done = done;
+    }
+
+    public Integer getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Integer duration) {
+        this.duration = duration;
     }
 
     public String getFrequency() {
@@ -117,12 +139,44 @@ public class Schedule {
         this.id = id;
     }
 
+    public boolean isGenerated() {
+        return isGenerated;
+    }
+
+    public void setGenerated(boolean generated) {
+        isGenerated = generated;
+    }
+
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    public List<Notification> getNotifications() {
+        return notifications;
+    }
+
+    public void setNotifications(List<Notification> notifications) {
+        this.notifications = notifications;
+    }
+
+    public Schedule getParentSchedule() {
+        return parentSchedule;
+    }
+
+    public void setParentSchedule(Schedule parentSchedule) {
+        this.parentSchedule = parentSchedule;
     }
 
     public LocalDateTime getTimeOfIntake() {
@@ -139,81 +193,5 @@ public class Schedule {
 
     public void setUser(User user) {
         this.user = user;
-    }
-
-
-    public Integer getDuration() {
-        return duration;
-    }
-
-    public void setDuration(Integer duration) {
-        this.duration = duration;
-    }
-
-    public String getNotes() {
-        return notes;
-    }
-
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
-
-
-    public List<Schedule> getChildSchedules() {
-        return childSchedules;
-    }
-
-    public void setChildSchedules(List<Schedule> childSchedules) {
-        this.childSchedules = childSchedules;
-    }
-
-    public boolean isGenerated() {
-        return isGenerated;
-    }
-
-    public void setGenerated(boolean generated) {
-        isGenerated = generated;
-    }
-
-
-    public Schedule getParentSchedule() {
-        return parentSchedule;
-    }
-
-    public void setParentSchedule(Schedule parentSchedule) {
-        this.parentSchedule = parentSchedule;
-    }
-
-    public List<Notification> getNotifications() {
-        return notifications;
-    }
-
-    public void setNotifications(List<Notification> notifications) {
-        this.notifications = notifications;
-    }
-
-    public Boolean getBuzzerTriggered() {
-        return buzzerTriggered;
-    }
-
-    public void setBuzzerTriggered(Boolean buzzerTriggered) {
-        this.buzzerTriggered = buzzerTriggered;
-    }
-
-    @Override
-    public String toString() {
-        return "Schedule{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", timeOfIntake=" + timeOfIntake +
-                ", frequency='" + frequency + '\'' +
-                ", duration=" + duration +
-                ", notes='" + notes + '\'' +
-                ", done=" + done +
-                ", isGenerated=" + isGenerated +
-                ", buzzerTriggered=" + buzzerTriggered +
-                ", userId=" + (user != null ? user.getId() : null) +
-                ", parentScheduleId=" + (parentSchedule != null ? parentSchedule.getId() : null) +
-                '}';
     }
 }

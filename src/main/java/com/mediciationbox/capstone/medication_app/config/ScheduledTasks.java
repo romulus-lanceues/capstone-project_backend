@@ -6,7 +6,7 @@ import com.mediciationbox.capstone.medication_app.dto.SchedulesForTodayEvent;
 import com.mediciationbox.capstone.medication_app.exception.NoExistingScheduleException;
 import com.mediciationbox.capstone.medication_app.model.ActiveUser;
 import com.mediciationbox.capstone.medication_app.model.Notification;
-import com.mediciationbox.capstone.medication_app.model.Schedule;
+import com.mediciationbox.capstone.medication_app.entity.Schedule;
 import com.mediciationbox.capstone.medication_app.repository.ActiveUserRepository;
 import com.mediciationbox.capstone.medication_app.repository.NotificationRepository;
 import com.mediciationbox.capstone.medication_app.repository.ScheduleRepository;

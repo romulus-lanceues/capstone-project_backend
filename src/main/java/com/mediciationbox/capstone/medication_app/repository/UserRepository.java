@@ -1,6 +1,6 @@
 package com.mediciationbox.capstone.medication_app.repository;
 
-import com.mediciationbox.capstone.medication_app.model.User;
+import com.mediciationbox.capstone.medication_app.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

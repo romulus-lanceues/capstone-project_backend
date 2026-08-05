@@ -1,7 +1,7 @@
 package com.mediciationbox.capstone.medication_app.dto;
 
 
-import com.mediciationbox.capstone.medication_app.model.Schedule;
+import com.mediciationbox.capstone.medication_app.entity.Schedule;
 
 import java.time.LocalDate;
 import java.util.List;

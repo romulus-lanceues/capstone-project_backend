@@ -1,8 +1,8 @@
 package com.mediciationbox.capstone.medication_app.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.mediciationbox.capstone.medication_app.entity.Schedule;
 import jakarta.persistence.*;
-import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 

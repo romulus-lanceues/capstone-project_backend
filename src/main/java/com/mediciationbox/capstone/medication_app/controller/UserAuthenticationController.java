@@ -3,7 +3,7 @@ package com.mediciationbox.capstone.medication_app.controller;
 
 import com.mediciationbox.capstone.medication_app.dto.LogInDTO;
 import com.mediciationbox.capstone.medication_app.dto.ResponseDTO;
-import com.mediciationbox.capstone.medication_app.model.User;
+import com.mediciationbox.capstone.medication_app.entity.User;
 import com.mediciationbox.capstone.medication_app.repository.UserRepository;
 import com.mediciationbox.capstone.medication_app.service.UserAuthenticationService;
 import org.springframework.data.domain.Page;
@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 

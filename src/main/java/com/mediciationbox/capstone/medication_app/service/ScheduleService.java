@@ -1,21 +1,18 @@
 package com.mediciationbox.capstone.medication_app.service;
 
-import com.mediciationbox.capstone.medication_app.config.ScheduledTasks;
 import com.mediciationbox.capstone.medication_app.dto.AddScheduleDTO;
 import com.mediciationbox.capstone.medication_app.dto.SchedulesForTodayEvent;
 import com.mediciationbox.capstone.medication_app.exception.NoExistingAccountException;
 import com.mediciationbox.capstone.medication_app.exception.NoExistingScheduleException;
-import com.mediciationbox.capstone.medication_app.model.Schedule;
-import com.mediciationbox.capstone.medication_app.model.User;
+import com.mediciationbox.capstone.medication_app.entity.Schedule;
+import com.mediciationbox.capstone.medication_app.entity.User;
 import com.mediciationbox.capstone.medication_app.repository.ScheduleRepository;
 import com.mediciationbox.capstone.medication_app.repository.UserRepository;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;

@@ -1,7 +1,7 @@
 package com.mediciationbox.capstone.medication_app.controller;
 
 import com.mediciationbox.capstone.medication_app.exception.NoExistingScheduleException;
-import com.mediciationbox.capstone.medication_app.model.Schedule;
+import com.mediciationbox.capstone.medication_app.entity.Schedule;
 import com.mediciationbox.capstone.medication_app.repository.ScheduleRepository;
 import com.mediciationbox.capstone.medication_app.repository.UserRepository;
 import org.springframework.http.HttpStatus;

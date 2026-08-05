@@ -2,8 +2,8 @@ package com.mediciationbox.capstone.medication_app.controller;
 
 import com.mediciationbox.capstone.medication_app.dto.AddScheduleDTO;
 import com.mediciationbox.capstone.medication_app.dto.ResponseDTO;
-import com.mediciationbox.capstone.medication_app.model.Schedule;
-import com.mediciationbox.capstone.medication_app.model.User;
+import com.mediciationbox.capstone.medication_app.entity.Schedule;
+import com.mediciationbox.capstone.medication_app.entity.User;
 import com.mediciationbox.capstone.medication_app.repository.ScheduleRepository;
 import com.mediciationbox.capstone.medication_app.repository.UserRepository;
 import com.mediciationbox.capstone.medication_app.service.JWTService;

@@ -6,7 +6,7 @@ import com.mediciationbox.capstone.medication_app.exception.NoActiveUserExceptio
 import com.mediciationbox.capstone.medication_app.model.ActiveUser;
 import com.mediciationbox.capstone.medication_app.model.IntakeTable;
 import com.mediciationbox.capstone.medication_app.model.Notification;
-import com.mediciationbox.capstone.medication_app.model.Schedule;
+import com.mediciationbox.capstone.medication_app.entity.Schedule;
 import com.mediciationbox.capstone.medication_app.repository.ActiveUserRepository;
 import com.mediciationbox.capstone.medication_app.repository.IntakeTableRepository;
 import com.mediciationbox.capstone.medication_app.repository.NotificationRepository;
@@ -26,7 +26,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 public class NotificationController {

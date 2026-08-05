@@ -1,10 +1,9 @@
 package com.mediciationbox.capstone.medication_app.config;
 
-import com.mediciationbox.capstone.medication_app.model.User;
+import com.mediciationbox.capstone.medication_app.entity.User;
 import com.mediciationbox.capstone.medication_app.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
