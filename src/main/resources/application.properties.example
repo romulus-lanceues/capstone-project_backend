@@ -1,9 +1,9 @@
 spring.application.name=medication-app
 
-#Supabase Credentials
-spring.datasource.url=jdbc:postgresql://YOUR_SUPABASE_URL:5432/postgres
-spring.datasource.username=YOUR_SUPABASE_USERNAME
-spring.datasource.password=YOUR_SUPABASE_PASSWORD
+#Database Credentials
+spring.datasource.url=jdbc:postgresql: Database URL
+spring.datasource.username= Database username
+spring.datasource.password= Database password
 
 #JPA Settings
 spring.jpa.hibernate.ddl-auto=update
@@ -21,6 +21,10 @@ spring.mail.password=YOUR_APP_PASSWORD
 spring.mail.properties.mail.smtp.auth=true
 spring.mail.properties.mail.smtp.starttls.enable=true
 spring.mail.properties.mail.smtp.starttls.required=true
+
+#Flyway Configuration
+spring.flyway.enabled=true
+spring.flyway.locations=classpath:db/migration
 
 #NodeMCU info
 nodemcu.ip.address=esp32-sensor.local
